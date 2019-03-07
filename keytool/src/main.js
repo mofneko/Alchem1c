@@ -1,0 +1,48 @@
+const {app, BrowserWindow} = require('electron')
+const path = require('path')
+const url = require('url')
+var log = require('electron-log');
+
+process.on('uncaughtException', function(err) {
+  log.error('electron:event:uncaughtException');
+  log.error(err);
+  log.error(err.stack);
+  app.quit();
+});
+
+// global
+let win
+
+function createWindow () {
+   win = new BrowserWindow({
+    title: 'KeyTool by mofneko',
+    width: 600, 
+    height: 500,
+    resizable: false,
+    icon: __dirname + '/Icon/Icon.icns'
+  })
+
+  win.loadURL(url.format({
+    pathname: path.join(__dirname, '../index.html'),
+    protocol: 'file:',
+    slashes: true
+  }))
+
+  win.on('closed', () => {
+    win = null
+  })
+}
+
+app.on('ready', createWindow)
+
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') {
+    app.quit()
+  }
+})
+
+app.on('activate', () => {
+  if (win === null) {
+    createWindow()
+  }
+})
